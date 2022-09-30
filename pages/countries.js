@@ -1,33 +1,57 @@
 const axios = require('axios').default;
+const slugify = require('slugify');
 
-function countriesList({ countries }){
-  return <h1>Countries List</h1>
-  {
-    countries.map(countries => {
+function countriesList({ countryCode }){
+  //console.log('countryCode', countryCode);
+  return (
+    <>
+    <h1>Countries List</h1>
+
+    {countryCode.map((country) => {
       return (
-        <div key= {countries.cioc}>
-          //<p>{countries.name.common}</p>
-          <p>{countries.cioc}</p>
+        <div key= {country}>
+          <p>{country}</p>
         </div>
       )
-    })
-    }
-  }
+    })}
+    </>
+  )
+}
 
 export default countriesList
 
 export async function getStaticProps(){
-  const id = [];
-  axios('https://restcountries.com/v3.1/all')
-  .then(response => {
-    const code = response.data;
-    for(let range = 0; range <= 251; range++){
-      id[range] = code[range];
+  //var id = [];
+  const response = await axios('https://restcountries.com/v3.1/all')
+  try {
+    const id = response.data.map((country) => slugify(country.name.common,{
+      lower: true
+    }))
+    return {
+      props: {
+        countryCode: id,
+      },
     }
-  })
-  return {
-    props: {
-      countries: id,
-    },
   }
+  catch(e){
+    console.log("Cioc not found.");
+  }
+  //Slugify
 }
+//
+// export async function getStaticPaths(){
+//   const response = await axios('https://restcountries.com/v3.1/all')
+//   try {
+//     const id = response.data.map((country) => slugify(country.name.common,{
+//       lower: true
+//     }))
+//     return {
+//       props: {
+//         countryCode: id,
+//       },
+//     }
+//   }
+//   catch(e){
+//     console.log("Cioc not found.");
+//   }
+// }
